@@ -492,7 +492,6 @@ class WoWItemParser
 
 		//kd3 is lazy. $a is quicker to type than array_key_exists.
 		$h = 'htmlspecialchars'; //always, always, ALWAYS escape user input
-		$a = 'array_key_exists';
 
 		// parse!
 		foreach ($args as $k => $v) {
@@ -910,13 +909,12 @@ class WoWItemParser
 	private function _sanityCheck(&$attr)
 	{
 		//kd3 is lazy. $a is quicker to type than array_key_exists.
-		$a = 'array_key_exists';
 		$n = 'is_numeric';
 		/*
 		 * need some attributes before we go any further, can't make them up:
 		 * name, id, ilvl
 		 */
-		if (!$a('name', $attr) || !$a('id', $attr) || !$a('ilvl', $attr)
+		if (!isset ($attr['name']) || !isset ($attr['id']) || !isset ($attr['ilvl'])
 			|| !$n($attr['id']) || !$n($attr['ilvl'])
 		) {
 			return 'Tooltip error: <span class="error">All items must have ' .
@@ -928,26 +926,28 @@ class WoWItemParser
 		 * the time) define it here so we only have to check itempage and not
 		 * "maybe check itempage or name" in the renderers.
 		 */
-		if (!$a('itempage', $attr)) {
+		if (!isset ($attr['itempage'])) {
 			$attr['itempage'] = $attr['name'];
 		}
 
 		//display an icon, even if the user doesn't define one. Bad user. Bad.
-		if (!$a('icon', $attr)) {
+		if (!isset ($attr['icon'])) {
 			$attr['icon'] = "Temp";
 		}
 		//quality poor if not defined. Bad user. Bad.
-		if (!$a('quality', $attr)) {
+		if (!isset ($attr['quality'])) {
 			$attr['quality'] = $this->_quality(0);
 		}
 
 		//weapon sanity check
-		$weapon = ($a('dmg', $attr) && $a('speed', $attr) && $a('dps', $attr)
-			&& count($attr['dmg']) == 2 && $n($attr['dmg'][0])
-			&& $n($attr['dmg'][1]) && $n($attr['dps']) && $n($attr['speed']));
-		if (($a('dmg', $attr) && !$weapon)
-			|| ($a('speed', $attr) && !$weapon)
-			|| ($a('dps', $attr) && !$weapon)
+		$weapon = (isset ($attr['dmg']) && isset ($attr['speed'])
+			&& isset($attr['dps'])
+				&& count($attr['dmg']) == 2 && $n($attr['dmg'][0])
+				&& $n($attr['dmg'][1]) && $n($attr['dps'])
+				&& $n($attr['speed']));
+		if ((isset ($attr['dmg']) && !$weapon)
+			|| (isset ($attr['speed']) && !$weapon)
+			|| (isset ($attr['dps']) && !$weapon)
 		) {
 			return 'Tooltip error: <span class="error">Weapons must have ' .
 			'low-end damage, high-end damage and attack speed defined!</span>';
@@ -963,9 +963,9 @@ class WoWItemParser
 				$attr['feraldps'] = (($attr['dps'] - 54.8) * 14);
 			}
 
-			$bonusdamage = ($a('bdmg', $attr) && (count($attr['bdmg']) == 2)
+			$bonusdamage = (isset ($attr['bdmg']) && (count($attr['bdmg']) == 2)
 				&& $n($attr['bdmg'][0]) && $n($attr['bdmg'][1]));
-			if (!$weapon && !$bonusdamage && $a('bdmg', $attr)) {
+			if (!$weapon && !$bonusdamage && isset ($attr['bdmg'])) {
 				return 'Tooltip error: <span class="error">Bonus low-end ' .
 					'damage and bonus high-end damage must be defined ' .
 					'together!</span>';
@@ -977,11 +977,11 @@ class WoWItemParser
 
 
 		//recipe sanity check
-		$recipe = ($a('create', $attr) && $a('createq', $attr)
-			&& $a('reagents', $attr));
-		if (($a('create', $attr) && !$recipe)
-			|| ($a('createq', $attr) && !$recipe)
-			|| ($a('reagents', $attr) && !$recipe)
+		$recipe = (isset ($attr['create']) && isset ($attr['createq'])
+			&& isset ($attr['reagents']));
+		if ((isset ($attr['create']) && !$recipe)
+			|| (isset ($attr['createq']) && !$recipe)
+			|| (isset ($attr['reagents']) && !$recipe)
 		) {
 			return 'Tooltip error: <span class="error">Recipes must have ' .
 				'"create", "createq" and "reagents" defined!</span>';
@@ -991,9 +991,9 @@ class WoWItemParser
 		}
 
 		//socket sanity check
-		$socketed = ($a('socket', $attr) && $a('sockbonus', $attr));
-		if (($a('socket', $attr) && !$socketed)
-			|| ($a('sockbonus', $attr) && !$socketed)
+		$socketed = (isset ($attr['socket']) && isset ($attr['sockbonus']));
+		if ((isset ($attr['socket']) && !$socketed)
+			|| (isset ($attr['sockbonus']) && !$socketed)
 		) {
 			return 'Tooltip error: <span class="error">Socketed items must ' .
 				'have a socket bonus!</span>';
@@ -1003,9 +1003,9 @@ class WoWItemParser
 		}
 
 		//rep requirement sanity check
-		$rep = ($a('faction', $attr) && $a('factionrating', $attr));
-		if (($a('faction', $attr) && !$rep)
-			|| ($a('factionrating', $attr) && !$rep)
+		$rep = (isset ($attr['faction']) && isset($attr['factionrating']));
+		if ((isset ($attr['faction']) && !$rep)
+			|| (isset ($attr['factionrating']) && !$rep)
 		) {
 			return 'Tooltip error: <span class="error">Reputation ' .
 				'requirements must list the required reputation ' .
@@ -1016,9 +1016,9 @@ class WoWItemParser
 		}
 
 		//profession requirement sanity check
-		$prof = ($a('skill', $attr) && $a('skillrating', $attr));
-		if (($a('skill', $attr) && !$prof)
-			|| ($a('skillrating', $attr) && !$prof)
+		$prof = (isset ($attr['skill']) && isset ($attr['skillrating']));
+		if ((isset ($attr['skill']) && !$prof)
+			|| (isset ($attr['skillrating']) && !$prof)
 		) {
 			return 'Tooltip error: <span class="error">Profession ' .
 				'requirements must list the required profession ' .
@@ -1029,55 +1029,55 @@ class WoWItemParser
 		}
 
 		//bag sanity check
-		if (($a('bagtype' , $attr)) && (!$a('bagslots', $attr))) {
+		if (isset ($attr['bagtype']) && !isset ($attr['bagslots'])) {
 			return 'Tooltip error: <span class="error">A bagtype was ' .
 			'specified, but not the size of the bag?</span>';
 		}
 		//set sanity check
-		$set = ($a('set' , $attr) && $a('setpieces', $attr));
-		if ($a('set', $attr) && !$a('setpieces', $attr)) {
+		$set = (isset ($attr['set']) && isset ($attr['setpieces']));
+		if (isset ($attr['set']) && !isset ($attr['setpieces'])) {
 			return 'Tooltip error: <span class="error">Please define the ' .
 			'size of the item set with setpieces=x</span>';
 		}
 		if ($set) {
 			$attr['setpiece'] = true;
-			if (!$a('setpage', $attr)) {
+			if (!isset ($attr['setpage'])) {
 				$attr['setpage'] = $attr['set'];
 			}
 		}
 		//"Requires Level 1" is met by default. Don't bother.
-		if ($a('level', $attr) && ($attr['level'] == 1)) {
+		if (isset ($attr['level']) && ($attr['level'] == 1)) {
 			unset ($attr['level']);
 		}
 		//1, n, or infinite charges. #3 shouldn't be passed, ignore #1.
-		if ($a('charges', $attr) && ($attr['charges'] == 1)) {
+		if (isset ($attr['charges']) && ($attr['charges'] == 1)) {
 			unset ($attr['charges']);
 		}
 		//unique (1) and Unique-Equipped (1) should lose the 1
-		if ($a('uniqueN', $attr) && ($attr['uniqueN'] == 1)) {
+		if (isset ($attr['uniqueN']) && ($attr['uniqueN'] == 1)) {
 			$attr['unique'] = true;
 			unset ($attr['uniqueN']);
-		} elseif ($a('uniqueEqN', $attr) && ($attr['uniqueEqN'] == 1)) {
+		} elseif (isset ($attr['uniqueEqN']) && ($attr['uniqueEqN'] == 1)) {
 			$attr['uniqueEq'] = true;
 			unset ($attr['uniqueEqN']);
 		}
 		//if we only caught one unknown, it's hopefully our instance bind
-		if ($a('undef', $attr) && (sizeof($attr['undef']) == 1)) {
+		if (isset ($attr['undef']) && (sizeof($attr['undef']) == 1)) {
 			$attr['locationbind'] = $attr['undef'][0];
 		}
 
 		//sort some of our sortable attributes
-		if ($a('class', $attr)) {
+		if (isset ($attr['class'])) {
 			$class = $attr['class'];
 			ksort($class);
 			$attr['class'] = $class;
 		}
-		if ($a('race', $attr)) {
+		if (isset ($attr['race'])) {
 			$race = $attr['race'];
 			ksort($race);
 			$attr['race'] = $race;
 		}
-		if ($a('resist', $attr)) {
+		if (isset ($attr['resist'])) {
 			$resist = $attr['resist'];
 			ksort($resist);
 			$attr['resist'] = $resist;

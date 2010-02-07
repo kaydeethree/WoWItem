@@ -914,7 +914,7 @@ class WoWItemParser
 		 * need some attributes before we go any further, can't make them up:
 		 * name, id, ilvl
 		 */
-		if (!isset ($attr['name']) || !isset ($attr['id']) || !isset ($attr['ilvl'])
+		if (!isset ($attr['name'], $attr['id'], $attr['ilvl'])
 			|| !$n($attr['id']) || !$n($attr['ilvl'])
 		) {
 			return 'Tooltip error: <span class="error">All items must have ' .
@@ -940,8 +940,7 @@ class WoWItemParser
 		}
 
 		//weapon sanity check
-		$weapon = (isset ($attr['dmg']) && isset ($attr['speed'])
-			&& isset($attr['dps'])
+		$weapon = (isset ($attr['dmg'], $attr['speed'], $attr['dps'])
 				&& count($attr['dmg']) == 2 && $n($attr['dmg'][0])
 				&& $n($attr['dmg'][1]) && $n($attr['dps'])
 				&& $n($attr['speed']));
@@ -977,8 +976,7 @@ class WoWItemParser
 
 
 		//recipe sanity check
-		$recipe = (isset ($attr['create']) && isset ($attr['createq'])
-			&& isset ($attr['reagents']));
+		$recipe = isset ($attr['create'], $attr['createq'], $attr['reagents']);
 		if ((isset ($attr['create']) && !$recipe)
 			|| (isset ($attr['createq']) && !$recipe)
 			|| (isset ($attr['reagents']) && !$recipe)
@@ -991,7 +989,7 @@ class WoWItemParser
 		}
 
 		//socket sanity check
-		$socketed = (isset ($attr['socket']) && isset ($attr['sockbonus']));
+		$socketed = isset ($attr['socket'], $attr['sockbonus']);
 		if ((isset ($attr['socket']) && !$socketed)
 			|| (isset ($attr['sockbonus']) && !$socketed)
 		) {
@@ -1003,7 +1001,7 @@ class WoWItemParser
 		}
 
 		//rep requirement sanity check
-		$rep = (isset ($attr['faction']) && isset($attr['factionrating']));
+		$rep = isset ($attr['faction'], $attr['factionrating']);
 		if ((isset ($attr['faction']) && !$rep)
 			|| (isset ($attr['factionrating']) && !$rep)
 		) {
@@ -1016,7 +1014,7 @@ class WoWItemParser
 		}
 
 		//profession requirement sanity check
-		$prof = (isset ($attr['skill']) && isset ($attr['skillrating']));
+		$prof = isset ($attr['skill'], $attr['skillrating']);
 		if ((isset ($attr['skill']) && !$prof)
 			|| (isset ($attr['skillrating']) && !$prof)
 		) {
@@ -1034,7 +1032,7 @@ class WoWItemParser
 			'specified, but not the size of the bag?</span>';
 		}
 		//set sanity check
-		$set = (isset ($attr['set']) && isset ($attr['setpieces']));
+		$set = isset ($attr['set'], $attr['setpieces']);
 		if (isset ($attr['set']) && !isset ($attr['setpieces'])) {
 			return 'Tooltip error: <span class="error">Please define the ' .
 			'size of the item set with setpieces=x</span>';
